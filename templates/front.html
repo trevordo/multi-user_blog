@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+  {% for p in posts %}
+    
+    <a href="{{ '/blog/details/%s' % p.key().id() }}" class="blog-link">
+
+        {{ p.render() | safe }}
+      
+    </a>
+    {% if user.name == p.author %}
+    <div class="blog-content">
+        <a href="{{ '/blog/editpost?post=%s' % p.key().id() }}" class="button">
+          Edit
+        </a>
+        <a href="{{ '/blog/deletepost?post=%s' % p.key().id() }}" class="button">
+          Delete
+        </a>
+    </div>
+    {% else %}
+          <!--blank-->
+    {% endif %}
+  {% endfor %}
+      
+  
+    
+{% endblock %}

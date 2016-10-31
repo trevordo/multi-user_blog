@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link type="text/css" rel="stylesheet" href="/css/main.css" />
+  <link type="text/css" rel="stylesheet" href="/css/styles.css" />
+  <title>Trevor's Blog</title>
+</head>
+
+<body>
+  <div class="blog-post">
+    {% if user %}
+      <a class="login-link" href="/blog/newpost">New Post</a>
+    {% else %}
+      <!--blank-->
+    {% endif %}
+  </div>
+
+  <a href="/blog" class="main-title">
+    Trevor's Blog
+  </a>
+
+  <div class="login-area">
+    {% if user %}
+      {{user.name}} (<a class="login-link" href="/logout">logout</a>)
+    {% else %}
+      <a class="login-link" href="/login">login</a>
+      |
+      <a class="login-link" href="/signup">signup</a>
+    {% endif %}
+  </div>
+  <br>
+  <a href="/blog" class="main-title">
+    {{ successhandler}}
+  </a>
+
+  <div id="content">
+  {% block content %}
+  {% endblock %}
+  </div>
+</body>
+
+</html>
+
