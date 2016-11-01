@@ -215,18 +215,32 @@ class EditPost(BlogHandler):
                         error=error)
     
 def delete(self):
-    if not self.user:
-        self.redirect('/blog')
+    def get(self):
+        if self.user:
+            post_id = self.request.get("post")
+            key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+            post = db.get(key)
 
-    post_id = self.request.get("post")
-    key = db.Key.from_path('Post', int(post_id), parent=blog_key())
-    post = db.get(key)
-    if self.user.name == post.author:
-        post.delete()
-        successhandler = "Post Deteled!"
-        self.redirect('/blog', successhandler=successhandler)
-    else:
-        self.redirect("/login")
+            self.render("deletepost.html", post=post)
+        else:
+            self.redirect("/login")
+
+    def post(self):
+        if not self.user:
+            self.redirect('/blog')
+
+        else: 
+            post_id = self.request.get("post")
+            key = db.Key.from_path("Post", int(post_id), parent=blog_key())
+            post = db.get(key)
+            
+            if post and post.author == self.user.name:
+                post.delete()
+                self.redirect('/blog')
+            else:
+                error = "Post can only be deleted by author!"
+                self.render("deletepost.html",
+                            error=error)
 
 class DetailsPage(BlogHandler):
     def get(self, post_id):

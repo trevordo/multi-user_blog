@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2 class="color: red">Detele post</h2>
+
+  {{ error }}
+  {{post.render() | safe}}
+
+    <form method="post">
+      <input type="submit">
+    </form>
+{% endblock %}

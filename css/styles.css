@@ -11,7 +11,7 @@
     color: #333;
 }
 
-.button {
+.button-edit {
     background-color: #4CAF50; /* Green */
     border: none;
     color: white;
@@ -22,8 +22,21 @@
     font-size: 12px;
     position: absolute;
     bottom: 0px;
-    right: 0px;
+    left: 0px;
 
+}
+
+.button-delete {
+    background-color: #991F1F; /* currant */
+    border: none;
+    color: white;
+    padding: 3px 10px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 12px;
+    position: relative;
+    bottom: 0px;
+    right: 0px;
 }
 
 .blog-content {

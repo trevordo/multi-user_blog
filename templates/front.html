@@ -11,8 +11,11 @@
     </a>
     {% if user.name == p.author %}
     <div class="blog-content">
-        <a href="{{ '/blog/editpost?post=%s' % p.key().id() }}" class="button">
+        <a href="{{ '/blog/editpost?post=%s' % p.key().id() }}" class="button-edit">
           Edit
+        </a>
+        <a href="{{ '/blog/deletepost?post=%s' % p.key().id() }}" class="button-delete">
+          Delete
         </a>
     </div>
     {% else %}
