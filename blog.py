@@ -213,22 +213,20 @@ class EditPost(BlogHandler):
                         subject=subject, 
                         content=content, 
                         error=error)
+    
+def delete(self):
+    if not self.user:
+        self.redirect('/blog')
 
-class DeletePost(BlogHandler):
-    def get(self):
-        if not self.user:
-            self.redirect('/blog')
-
-        post_id = self.request.get("post")
-        key = db.Key.from_path('Post', int(post_id), parent=blog_key())
-        post = db.get(key)
-
-        if self.user.name == post.author:
-            post.delete()
-            successhandler = "Post Deteled!"
-            self.redirect('/blog', successhandler=successhandler)
-        else:
-            self.redirect("/login")
+    post_id = self.request.get("post")
+    key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+    post = db.get(key)
+    if self.user.name == post.author:
+        post.delete()
+        successhandler = "Post Deteled!"
+        self.redirect('/blog', successhandler=successhandler)
+    else:
+        self.redirect("/login")
 
 class DetailsPage(BlogHandler):
     def get(self, post_id):
@@ -240,6 +238,7 @@ class DetailsPage(BlogHandler):
             return
 
         self.render("details.html", post = post)
+
 
 ##### form validation
 
@@ -348,7 +347,7 @@ app = webapp2.WSGIApplication([('/', MainPage),
                                ('/blog/([0-9]+)', PostPage),
                                ('/blog/newpost', NewPost),
                                ('/blog/editpost', EditPost),
-                               ('/blog/deletepost', DeletePost),
+                               ('/blog/details/([0-9]+)', DetailsPage),
                                ('/signup', Register),
                                ('/login', Login),
                                ('/logout', Logout),
