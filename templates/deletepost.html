@@ -1,12 +1,15 @@
+
 {% extends "base.html" %}
 
 {% block content %}
-  <h2 class="color: red">Detele post</h2>
-
-  {{ error }}
-  {{post.render() | safe}}
-
+  <div>
+  <h2>Delete post</h2>
+  <h3>{{ post.subject }}</h3>
+    <div class="error">{{error}}</div>
+    <div> {{post.render() | safe}} </div>
     <form method="post">
-      <input type="submit">
+      <input type="submit" class="button-delete"> <a href="/blog" class="button-edit">Cancel</a>
     </form>
+
+  </div>
 {% endblock %}

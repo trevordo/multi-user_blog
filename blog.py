@@ -214,33 +214,18 @@ class EditPost(BlogHandler):
                         content=content, 
                         error=error)
     
-def delete(self):
+class DeletePost(self):
     def get(self):
         if self.user:
             post_id = self.request.get("post")
             key = db.Key.from_path('Post', int(post_id), parent=blog_key())
             post = db.get(key)
+            subject = post.subject
 
-            self.render("deletepost.html", post=post)
+            self.render("deletepost.html", post=post, subject=subject)
         else:
             self.redirect("/login")
 
-    def post(self):
-        if not self.user:
-            self.redirect('/blog')
-
-        else: 
-            post_id = self.request.get("post")
-            key = db.Key.from_path("Post", int(post_id), parent=blog_key())
-            post = db.get(key)
-            
-            if post and post.author == self.user.name:
-                post.delete()
-                self.redirect('/blog')
-            else:
-                error = "Post can only be deleted by author!"
-                self.render("deletepost.html",
-                            error=error)
 
 class DetailsPage(BlogHandler):
     def get(self, post_id):
@@ -361,6 +346,7 @@ app = webapp2.WSGIApplication([('/', MainPage),
                                ('/blog/([0-9]+)', PostPage),
                                ('/blog/newpost', NewPost),
                                ('/blog/editpost', EditPost),
+                               ('/blog/deletepost', DeletePost),
                                ('/blog/details/([0-9]+)', DetailsPage),
                                ('/signup', Register),
                                ('/login', Login),
