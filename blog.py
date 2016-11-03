@@ -7,7 +7,6 @@ from string import letters
 
 import webapp2
 import jinja2
-import comments
 
 from google.appengine.ext import db
 
@@ -132,7 +131,18 @@ class Post(db.Model):
         self._render_text = self.content.replace('\n', '<br>')
         return render_str("post.html", p = self)
 
-# blog page rendering
+class Comment(db.Model):
+    author = db.StringProperty(default = "")
+    subject = db.StringProperty(required = True)
+    content = db.TextProperty(required = True)
+    created = db.DateTimeProperty(auto_now_add = True)
+    last_modified = db.DateTimeProperty(auto_now = True)
+
+    def render(self):
+        self._render_text = self.content.replace('\n', '<br>')
+        return render_str("post.html", p = self)
+
+##### Blog section rendering
 
 class BlogFront(BlogHandler):
     def get(self):
@@ -256,7 +266,117 @@ class DetailsPage(BlogHandler):
 
         self.render("details.html", post = post)
 
-##### form validation
+##### Likes section rendering
+
+##### Comment section rendering
+
+class PostComment(BlogHandler):
+    def get(self, comment_id):
+        key = db.Key.from_path('Comment', int(comment_id), parent=blog_key())
+        comment = db.get(key)
+
+        if not comment:
+            self.error(404)
+            return
+
+        self.render("permalink.html", comment = comment)
+
+class NewComment(BlogHandler):
+    def get(self):
+        if self.user:
+            self.render("newcomment.html")
+        else:
+            self.redirect("/login")
+
+    def comment(self):
+        if not self.user:
+            self.redirect('/blog')
+
+        subject = self.request.get('subject')
+        content = self.request.get('content')
+        author = str(self.user.name)
+
+        if subject and content:
+            p = comment(parent = blog_key(),
+                     subject = subject,
+                     content = content,
+                     author = author)
+            p.put()
+            self.redirect('/blog/%s' % str(p.key().id()))
+        else:
+            error = "subject and content, please!"
+            self.render("newcomment.html",
+                        subject=subject, 
+                        content=content, 
+                        error=error)
+
+class EditComment(BlogHandler):
+    def get(self):
+        if self.user:
+            comment_id = self.request.get("comment")
+            key = db.Key.from_path('comment', int(comment_id), parent=blog_key())
+            comment = db.get(key)
+            subject = comment.subject
+            content = comment.content
+
+            self.render("editcomment.html", subject=subject, content=content)
+        else:
+            self.redirect("/login")
+
+    def comment(self):
+        if not self.user:
+            self.redirect('/blog')
+
+        comment_id = self.request.get("comment")
+        key = db.Key.from_path('comment', int(comment_id), parent=blog_key())
+        comment = db.get(key)
+        subject = self.request.get('subject')
+        content = self.request.get('content')
+        
+        if subject and content:
+            comment.subject = subject
+            comment.content = content
+            comment.put()
+            self.redirect('/blog/%s' % str(comment.key().id()))
+            
+        else:
+            error = "subject and content are required, please!"
+            self.render("editcomment.html",
+                        subject=subject, 
+                        content=content, 
+                        error=error)
+
+class DeleteComment(BlogHandler):
+    def get(self):
+        if self.user:
+            comment_id = self.request.get("comment")
+            key = db.Key.from_path('comment', int(comment_id), parent=blog_key())
+            comment = db.get(key)
+
+            self.render("deletecomment.html", comment=comment)
+        else:
+            self.redirect("/login")
+
+    def comment(self):
+        if not self.user:
+            self.redirect('/blog')
+
+        else: 
+            comment_id = self.request.get("comment")
+            key = db.Key.from_path("comment", int(comment_id), parent=blog_key())
+            comment = db.get(key)
+            
+            if comment and comment.author == self.user.name:
+                comment.delete()
+                self.redirect('/blog')
+            else:
+                error = "comment can only be deleted by author!"
+                self.render("deletecomment.html",
+                            subject=subject, 
+                            content=content, 
+                            error=error)
+
+##### Form validation
 
 USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
 def valid_username(username):
@@ -361,10 +481,15 @@ class Welcome(BlogHandler):
 app = webapp2.WSGIApplication([('/', MainPage),
                                ('/blog/?', BlogFront),
                                ('/blog/([0-9]+)', PostPage),
-                               ('/blog/details/([0-9]+)', PostPage),
+                               ('/blog/details/([0-9]+)', DetailsPage),
                                ('/blog/newpost', NewPost),
                                ('/blog/editpost', EditPost),
                                ('/blog/deletepost', DeletePost),
+                               ('/blog/details/([0-9]+)/comment/([0-9]+)', PostComment),
+                               ('/blog/details/([0-9]+)/newcomment', NewComment),
+                               ('/blog/details/([0-9]+)/editcomment', EditComment),
+                               ('/blog/details/([0-9]+)/deletecomment', DeleteComment),
+                               ('/blog/details/([0-9]+)/deletecomment/([0-9]+)', PostComment),
                                ('/signup', Register),
                                ('/login', Login),
                                ('/logout', Logout),

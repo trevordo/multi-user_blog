@@ -36,8 +36,22 @@
     font-size: 12px;
     position: absolute;
     bottom: 0px;
-    left: 10px;
+    left: 0px;
 
+}
+
+.button-delete {
+    background-color: #991F1F; /* currant */
+    border: none;
+    color: white;
+    padding: 3px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 12px;
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
 }
 
 .button-cancel {
@@ -57,7 +71,7 @@
 
 }
 
-.button-delete {
+.button-confirm {
     background-color: #991F1F; /* currant */
     border: none;
     color: white;
@@ -70,5 +84,7 @@
     bottom: 0px;
     right: 10px;
 }
+
+
 
 
