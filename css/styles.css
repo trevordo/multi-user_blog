@@ -1,3 +1,13 @@
+.blog-content {
+    position: relative;
+    width: 100%;
+    height: 21px;
+    display:inline-block;
+    overflow: auto;
+    white-space: nowrap;
+    margin:0px auto;
+}
+
 .blog-post {
     font-size: 13px;
     color: gray;
@@ -11,6 +21,10 @@
     color: #333;
 }
 
+.blog-warning {
+    color: red;
+}
+
 .button-edit {
     background-color: #4CAF50; /* Green */
     border: none;
@@ -22,6 +36,23 @@
     font-size: 12px;
     position: absolute;
     bottom: 0px;
+    left: 10px;
+
+}
+
+.button-cancel {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 3px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 24px;
+    position: absolute;
+    width: 74.703px;
+    height: 28px;
+    bottom: 10px;
     left: 0px;
 
 }
@@ -37,15 +68,7 @@
     font-size: 12px;
     position: absolute;
     bottom: 0px;
-    right: 0px;
+    right: 10px;
 }
 
-.blog-content {
-    position: relative;
-    width: 100%;
-    height: 21px;
-    display:inline-block;
-    overflow: auto;
-    white-space: nowrap;
-    margin:0px auto;
-}
+
