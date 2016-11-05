@@ -1,7 +1,20 @@
 {% extends "base.html" %}
 
 {% block content %}
-
+  <div class="blog-content">
+      {% if user %}
+        <a class="login-link" href="/blog/newpost" class="blog-left">New Post</a>
+      {% else %}
+        <!--blank-->
+      {% endif %}
+      <div class="blog-right">
+        {% if user %}
+          {{user.name}} (<a class="login-link" href="/log">Unlike</a>)
+        {% else %}
+          <a class="login-link" href="/blog">Like</a>
+        {% endif %}
+      </div>
+  </div>
   {% for p in posts %}
     
     <a href="{{ '/blog/details/%s' % p.key().id() }}" class="blog-link">
@@ -23,6 +36,4 @@
     {% endif %}
   {% endfor %}
       
-  
-    
 {% endblock %}

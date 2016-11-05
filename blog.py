@@ -132,9 +132,9 @@ class Post(db.Model):
         return render_str("post.html", p = self)
 
 class Comment(db.Model):
+    post_key = db.IntegerProperty(required = True)
     author = db.StringProperty(default = "")
-    subject = db.StringProperty(required = True)
-    content = db.TextProperty(required = True)
+    comment = db.TextProperty(required = True)
     created = db.DateTimeProperty(auto_now_add = True)
     last_modified = db.DateTimeProperty(auto_now = True)
 
@@ -288,10 +288,11 @@ class NewComment(BlogHandler):
         else:
             self.redirect("/login")
 
-    def comment(self):
+    def post(self):
         if not self.user:
             self.redirect('/blog')
-
+        post_id = self.request.get("post")
+        key = db.Key.from_path('post', int(comment_id), parent=blog_key())
         subject = self.request.get('subject')
         content = self.request.get('content')
         author = str(self.user.name)
@@ -323,7 +324,7 @@ class EditComment(BlogHandler):
         else:
             self.redirect("/login")
 
-    def comment(self):
+    def post(self):
         if not self.user:
             self.redirect('/blog')
 
@@ -357,7 +358,7 @@ class DeleteComment(BlogHandler):
         else:
             self.redirect("/login")
 
-    def comment(self):
+    def post(self):
         if not self.user:
             self.redirect('/blog')
 
@@ -477,7 +478,6 @@ class Welcome(BlogHandler):
         else:
             self.redirect('/signup')
 
-
 app = webapp2.WSGIApplication([('/', MainPage),
                                ('/blog/?', BlogFront),
                                ('/blog/([0-9]+)', PostPage),
@@ -485,11 +485,11 @@ app = webapp2.WSGIApplication([('/', MainPage),
                                ('/blog/newpost', NewPost),
                                ('/blog/editpost', EditPost),
                                ('/blog/deletepost', DeletePost),
-                               ('/blog/details/([0-9]+)/comment/([0-9]+)', PostComment),
-                               ('/blog/details/([0-9]+)/newcomment', NewComment),
-                               ('/blog/details/([0-9]+)/editcomment', EditComment),
-                               ('/blog/details/([0-9]+)/deletecomment', DeleteComment),
-                               ('/blog/details/([0-9]+)/deletecomment/([0-9]+)', PostComment),
+                               ('/blog/comment/([0-9]+)', PostComment),
+                               ('/blog/newcomment', NewComment),
+                               ('/blog/editcomment', EditComment),
+                               ('/blog/deletecomment', DeleteComment),
+                               ('/blog/([0-9]+)', PostComment),
                                ('/signup', Register),
                                ('/login', Login),
                                ('/logout', Logout),

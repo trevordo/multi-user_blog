@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
+  <div>
+    <div class="blog-content">
+      <a class="login-link" href="{{ '/blog/newcomment?post=%s' % post.key().id() }}">Add Comment</a>
+    </a>  
+  </div>
   {{post.render() | safe}}
 {% endblock %}

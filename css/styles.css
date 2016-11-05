@@ -25,6 +25,14 @@
     color: red;
 }
 
+.blog-left {
+    left: 0px;
+}
+
+.blog-right {
+    right: 0px;
+}
+
 .button-edit {
     background-color: #4CAF50; /* Green */
     border: none;
