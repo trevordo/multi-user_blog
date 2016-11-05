@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <div class="blog-content">
+  <div>
       {% if user %}
         <a class="login-link" href="/blog/newpost" class="blog-left">New Post</a>
       {% else %}
@@ -17,7 +17,7 @@
   </div>
   {% for p in posts %}
     
-    <a href="{{ '/blog/details/%s' % p.key().id() }}" class="blog-link">
+    <a href="{{ '/blog/details?post=%s' % p.key().id() }}" class="blog-link">
 
         {{ p.render() | safe }}
       

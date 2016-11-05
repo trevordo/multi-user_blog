@@ -1,10 +1,35 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <div>
-    <div class="blog-content">
-      <a class="login-link" href="{{ '/blog/newcomment?post=%s' % post.key().id() }}">Add Comment</a>
-    </a>  
-  </div>
-  {{post.render() | safe}}
+
+<div class="content">
+  <section>
+    {{post.render() | safe}}
+  </section>
+
+  <section class="blog-comment-form">
+    <h3>Post comment</h3>
+
+    <form method="post">
+      <label>
+        <textarea class=".blog-comment" name="comment">{{comment}}</textarea>
+      </label>
+
+      <div class="error">{{error}}</div>
+
+      <input type="submit">
+    </form>
+  </section>
+
+  <section>
+    <h2>Comments</h2>
+    <br>
+    {% for c in comments %}
+
+        {{ c.render() | safe }}
+
+    {% endfor %}
+  </section>
+</div>
+
 {% endblock %}

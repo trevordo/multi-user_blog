@@ -33,6 +33,11 @@
     right: 0px;
 }
 
+.blog-comment-form {
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+
 .button-edit {
     background-color: #4CAF50; /* Green */
     border: none;
