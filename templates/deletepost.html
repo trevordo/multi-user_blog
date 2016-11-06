@@ -7,8 +7,12 @@
   <h3>{{ post.subject }}</h3>
     <div class="error">{{error}}</div>
     <div> {{post.render() | safe}} </div>
+    <br>
+    <br>
     <form method="post">
-       <a href="/blog" class="button-cancel">Cancel</a><input type="submit" class="button-confirm">
+      <div class="blog-content">
+       <a href="/blog" class="button-cancel">Cancel</a><input type="submit" class="button-delete">
+      </div> 
     </form>
 
   </div>

@@ -126,6 +126,8 @@ class Post(db.Model):
     content = db.TextProperty(required = True)
     created = db.DateTimeProperty(auto_now_add = True)
     last_modified = db.DateTimeProperty(auto_now = True)
+    likes = db.IntegerProperty(required=False, default = 0)
+    liked_by = db.ListProperty(str)
 
     def render(self):
         self._render_text = self.content.replace('\n', '<br>')
@@ -254,6 +256,7 @@ class DeletePost(BlogHandler):
                             subject=subject, 
                             content=content, 
                             error=error)
+##### Comment section rendering
 
 class DetailsPage(BlogHandler):
     def get(self):
@@ -276,6 +279,7 @@ class DetailsPage(BlogHandler):
     def post(self):
         if not self.user:
             self.redirect('/blog')
+
         post_id = self.request.get("post")
         key = db.Key.from_path('Post', int(post_id), parent=blog_key())
         post = db.get(key)
@@ -300,8 +304,6 @@ class DetailsPage(BlogHandler):
                         comments=comments, 
                         error=error)
 
-##### Comment section rendering
-
 class EditComment(BlogHandler):
     def get(self):
         if self.user:
@@ -314,7 +316,7 @@ class EditComment(BlogHandler):
 
             comment = q.comment
 
-            self.render("editcomment.html", content=comment)
+            self.render("editcomment.html", content=comment, q=q)
         else:
             self.redirect("/login")
 
@@ -377,6 +379,52 @@ class DeleteComment(BlogHandler):
                             error=error)
 
 ##### Likes section rendering
+
+class LikePost(BlogHandler):
+    def get(self):
+        if not self.user:
+            self.redirect('/blog')
+
+        post_id = self.request.get("post")
+        key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+        post = db.get(key)
+
+        current_user = self.user.name
+        author = post.author
+
+        if not self.user:
+            self.redirect('/login')
+        elif current_user in post.liked_by:
+            error = "You already liked this post"
+            self.render("error.html", error=error)
+        else:    
+            post.likes += int(1)
+            post.liked_by.append(current_user)
+            post.put()
+            self.redirect("/blog")
+
+class UnlikePost(BlogHandler):
+    def get(self):
+        if not self.user:
+            self.redirect('/blog')
+            
+        post_id = self.request.get("post")
+        key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+        post = db.get(key)
+
+        current_user = self.user.name
+        author = post.author
+
+        if not self.user:
+            self.redirect('/login')
+        elif current_user not in post.liked_by:
+            error = "You have not yet liked this post"
+            self.render("error.html", error=error)
+        else:
+            post.likes -= int(1)
+            post.liked_by.remove(current_user)
+            post.put()
+            self.redirect("/blog")
 
 ##### Form validation
 
@@ -470,7 +518,7 @@ class Logout(BlogHandler):
 
 class MainPage(BlogHandler):
   def get(self):
-      self.render('index.html')
+      self.redirect('/blog')
 
 class Welcome(BlogHandler):
     def get(self):
@@ -488,6 +536,8 @@ app = webapp2.WSGIApplication([('/', MainPage),
                                ('/blog/deletepost', DeletePost),
                                ('/blog/editcomment', EditComment),
                                ('/blog/deletecomment', DeleteComment),
+                               ('/blog/likepost', LikePost),
+                               ('/blog/unlikepost', UnlikePost),
                                ('/signup', Register),
                                ('/login', Login),
                                ('/logout', Logout),

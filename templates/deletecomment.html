@@ -5,9 +5,14 @@
   <div>
   <h2 class="blog-warning">Delete comment</h2>
     <div class="error">{{error}}</div>
-    <div> {{comments.render() | safe}} </div>
+    <div> 
+      {{comments.render() | safe}} 
+    </div>
     <form method="post">
-      <input type="submit" class="button-delete"> <a href="/blog" class="button-cancel">Cancel</a>
+      <div class="blog-content-buttons">
+       <a href="{{ '/blog/details?post=%s' % comments.post_key }}" class="button-cancel">Cancel</a>
+       <input type="submit" class="button-delete">
+      </div> 
     </form>
 
   </div>

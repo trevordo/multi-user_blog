@@ -6,7 +6,7 @@
     <form method="post">
       <label>
         <div>subject</div>
-        <input type="text" name="subject" value="{{subject}}">
+        <input type="text" name="subject" value="{{subject}}" class="blog-field-subject">
       </label>
 
       <label>
@@ -16,6 +16,8 @@
 
       <div class="error">{{error}}</div>
 
-      <input type="submit">
+      <div class="blog-content-buttons">
+        <input type="submit" class="button-confirm">   <a href="/blog" class="button-confirm">Cancel</a>
+      </div>
     </form>
 {% endblock %}

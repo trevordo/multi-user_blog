@@ -1,11 +1,35 @@
 .blog-content {
     position: relative;
     width: 100%;
-    height: 21px;
+    height: 35px;
     display:inline-block;
     overflow: auto;
     white-space: nowrap;
     margin:0px auto;
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+.blog-content-buttons {
+    position: relative;
+    width: 80%;
+    height: 50px;
+    display:inline-block;
+    overflow: auto;
+    white-space: nowrap;
+    margin:0px auto;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.blog-fields {
+    padding: 2px;
+    height: 15px;
+    width: 169px;
+}
+
+.blog-field-subject {
+    width: 500px;
 }
 
 .blog-post {
@@ -26,10 +50,12 @@
 }
 
 .blog-left {
+    position: absolute;
     left: 0px;
 }
 
 .blog-right {
+    position: absolute;
     right: 0px;
 }
 
@@ -72,7 +98,7 @@
     background-color: #991F1F; /* currant */
     border: none;
     color: white;
-    padding: 3px 10px;
+    padding: 4px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
@@ -86,7 +112,7 @@
     background-color: #4CAF50; /* Green */
     border: none;
     color: white;
-    padding: 3px 10px;
+    padding: 4px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
@@ -94,23 +120,19 @@
     position: absolute;
     width: 74.703px;
     height: 28px;
-    bottom: 10px;
+    bottom: 0px;
     left: 0px;
 
 }
 
 .button-confirm {
-    background-color: #991F1F; /* currant */
+    background-color: dimgrey; /* currant */
     border: none;
     color: white;
-    padding: 3px 10px;
+    padding: 4px;
     text-align: center;
     text-decoration: none;
-    display: inline-block;
-    font-size: 12px;
-    position: absolute;
-    bottom: 0px;
-    right: 10px;
+    font-size: 24px;
 }
 
 
