@@ -119,7 +119,7 @@ class User(db.Model):
 def blog_key(name = 'default'):
     return db.Key.from_path('blogs', name)
 
-### Post method to DB
+### Database Models for Comment and Post
 class Post(db.Model):
     author = db.StringProperty(required = False)
     subject = db.StringProperty(required = True)
@@ -144,7 +144,7 @@ class Comment(db.Model):
         self._render_text = self.comment.replace('\n', '<br>')
         return render_str("comment.html", c = self)
 
-##### Blog section rendering
+##### Blog section rendering and post manipulation
 
 class BlogFront(BlogHandler):
     def get(self):
@@ -187,8 +187,8 @@ class NewPost(BlogHandler):
         else:
             error = "subject and content, please!"
             self.render("newpost.html",
-                        subject=subject, 
-                        content=content, 
+                        subject=subject,
+                        content=content,
                         error=error)
 
 class EditPost(BlogHandler):
@@ -223,8 +223,8 @@ class EditPost(BlogHandler):
         else:
             error = "subject and content are required, please!"
             self.render("editpost.html",
-                        subject=subject, 
-                        content=content, 
+                        subject=subject,
+                        content=content,
                         error=error)
 
 class DeletePost(BlogHandler):
@@ -242,7 +242,7 @@ class DeletePost(BlogHandler):
         if not self.user:
             self.redirect('/blog')
 
-        else: 
+        else:
             post_id = self.request.get("post")
             key = db.Key.from_path("Post", int(post_id), parent=blog_key())
             post = db.get(key)
@@ -253,10 +253,11 @@ class DeletePost(BlogHandler):
             else:
                 error = "Post can only be deleted by author!"
                 self.render("deletepost.html",
-                            subject=subject, 
-                            content=content, 
+                            subject=subject,
+                            content=content,
                             error=error)
-##### Comment section rendering
+
+##### Comment section rendering and comment manipulation
 
 class DetailsPage(BlogHandler):
     def get(self):
@@ -266,8 +267,9 @@ class DetailsPage(BlogHandler):
         key = db.Key.from_path('Post', int(post_id), parent=blog_key())
         post = db.get(key)
 
-        comments = db.Query(Comment).filter('post_key', post_id).order('-created')
-        
+        comments = db.Query(Comment).filter('post_key',
+                                            post_id).order('-created')
+
         if not post:
             self.error(404)
             return
@@ -296,12 +298,13 @@ class DetailsPage(BlogHandler):
             c.put()
             self.redirect('/blog/details?post=%s' % str(post.key().id()))
         else:
-            comments = db.Query(Comment).filter('post_key', post_id).order('-created')
+            comments = db.Query(Comment).filter('post_key',
+                                                post_id).order('-created')
             error = "Please enter a comment."
-            self.render("details.html", 
+            self.render("details.html",
                         post = post,
                         comment=comment,
-                        comments=comments, 
+                        comments=comments,
                         error=error)
 
 class EditComment(BlogHandler):
@@ -311,7 +314,9 @@ class EditComment(BlogHandler):
             key = db.Key.from_path('Post', int(post_id), parent=blog_key())
             post = db.get(key)
             comment_id = self.request.get("comment")
-            key = db.Key.from_path('Comment', int(comment_id), parent=blog_key())
+            key = db.Key.from_path('Comment',
+                                    int(comment_id),
+                                    parent=blog_key())
             q = db.get(key)
 
             comment = q.comment
@@ -340,9 +345,9 @@ class EditComment(BlogHandler):
         else:
             error = "Please enter a comment!"
             self.render("editcomment.html",
-                        comment=comment, 
+                        comment=comment,
                         error=error)
-
+                        
 class DeleteComment(BlogHandler):
     def get(self):
         if self.user:
@@ -350,7 +355,9 @@ class DeleteComment(BlogHandler):
             key = db.Key.from_path('Post', int(post_id), parent=blog_key())
             post = db.get(key)
             comment_id = self.request.get("comment")
-            key = db.Key.from_path('Comment', int(comment_id), parent=blog_key())
+            key = db.Key.from_path('Comment',
+                                    int(comment_id),
+                                    parent=blog_key())
             q = db.get(key)
 
             self.render("deletecomment.html", comments=q)
@@ -366,16 +373,18 @@ class DeleteComment(BlogHandler):
             key = db.Key.from_path('Post', int(post_id), parent=blog_key())
             post = db.get(key)
             comment_id = self.request.get("comment")
-            key = db.Key.from_path('Comment', int(comment_id), parent=blog_key())
+            key = db.Key.from_path('Comment',
+                                    int(comment_id),
+                                    parent=blog_key())
             q = db.get(key)
-            
+
             if q and q.author == self.user.name:
                 q.delete()
                 self.redirect('/blog/details?post=%s' % str(post.key().id()))
             else:
                 error = "comment can only be deleted by author!"
                 self.render("deletecomment.html",
-                            comments=q, 
+                            comments=q,
                             error=error)
 
 ##### Likes section rendering
@@ -407,7 +416,7 @@ class UnlikePost(BlogHandler):
     def get(self):
         if not self.user:
             self.redirect('/blog')
-            
+
         post_id = self.request.get("post")
         key = db.Key.from_path('Post', int(post_id), parent=blog_key())
         post = db.get(key)
