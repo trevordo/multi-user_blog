@@ -263,12 +263,6 @@ class DetailsPage(BlogHandler):
         key = db.Key.from_path('Post', int(post_id), parent=blog_key())
         post = db.get(key)
 
-        # get related comments
-        # Gql method:
-        #comments = db.GqlQuery(
-        #    "select * from Comment where post_key = :1 order by created desc",
-        #    post_id)
-        # Query method:
         comments = db.Query(Comment).filter('post_key', post_id).order('-created')
         
         if not post:
@@ -311,13 +305,16 @@ class DetailsPage(BlogHandler):
 class EditComment(BlogHandler):
     def get(self):
         if self.user:
+            post_id = self.request.get("post")
+            key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+            post = db.get(key)
             comment_id = self.request.get("comment")
-            key = db.Key.from_path('comment', int(comment_id), parent=blog_key())
-            comment = db.get(key)
-            subject = comment.subject
-            content = comment.content
+            key = db.Key.from_path('Comment', int(comment_id), parent=blog_key())
+            q = db.get(key)
 
-            self.render("editcomment.html", subject=subject, content=content)
+            comment = q.comment
+
+            self.render("editcomment.html", content=comment)
         else:
             self.redirect("/login")
 
@@ -325,33 +322,36 @@ class EditComment(BlogHandler):
         if not self.user:
             self.redirect('/blog')
 
+        post_id = self.request.get("post")
+        key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+        post = db.get(key)
         comment_id = self.request.get("comment")
-        key = db.Key.from_path('comment', int(comment_id), parent=blog_key())
-        comment = db.get(key)
-        subject = self.request.get('subject')
-        content = self.request.get('content')
-        
-        if subject and content:
-            comment.subject = subject
-            comment.content = content
-            comment.put()
-            self.redirect('/blog/%s' % str(comment.key().id()))
-            
+        key = db.Key.from_path('Comment', int(comment_id), parent=blog_key())
+        c = db.get(key)
+        comment = self.request.get('content')
+
+        if comment:
+            c.comment = comment
+            c.put()
+            self.redirect('/blog/details?post=%s' % str(post.key().id()))
+
         else:
-            error = "subject and content are required, please!"
+            error = "Please enter a comment!"
             self.render("editcomment.html",
-                        subject=subject, 
-                        content=content, 
+                        comment=comment, 
                         error=error)
 
 class DeleteComment(BlogHandler):
     def get(self):
         if self.user:
+            post_id = self.request.get("post")
+            key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+            post = db.get(key)
             comment_id = self.request.get("comment")
-            key = db.Key.from_path('comment', int(comment_id), parent=blog_key())
-            comment = db.get(key)
+            key = db.Key.from_path('Comment', int(comment_id), parent=blog_key())
+            q = db.get(key)
 
-            self.render("deletecomment.html", comment=comment)
+            self.render("deletecomment.html", comments=q)
         else:
             self.redirect("/login")
 
@@ -359,19 +359,21 @@ class DeleteComment(BlogHandler):
         if not self.user:
             self.redirect('/blog')
 
-        else: 
+        else:
+            post_id = self.request.get("post")
+            key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+            post = db.get(key)
             comment_id = self.request.get("comment")
-            key = db.Key.from_path("comment", int(comment_id), parent=blog_key())
-            comment = db.get(key)
+            key = db.Key.from_path('Comment', int(comment_id), parent=blog_key())
+            q = db.get(key)
             
-            if comment and comment.author == self.user.name:
-                comment.delete()
-                self.redirect('/blog')
+            if q and q.author == self.user.name:
+                q.delete()
+                self.redirect('/blog/details?post=%s' % str(post.key().id()))
             else:
                 error = "comment can only be deleted by author!"
                 self.render("deletecomment.html",
-                            subject=subject, 
-                            content=content, 
+                            comments=q, 
                             error=error)
 
 ##### Likes section rendering

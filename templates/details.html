@@ -12,7 +12,7 @@
 
     <form method="post">
       <label>
-        <textarea class=".blog-comment" name="comment">{{comment}}</textarea>
+        <textarea class=".blog-comment-textarea" name="comment">{{comment}}</textarea>
       </label>
 
       <div class="error">{{error}}</div>
@@ -27,7 +27,19 @@
     {% for c in comments %}
 
         {{ c.render() | safe }}
-
+        
+        {% if user.name == c.author %}
+          <div class="blog-comment-button">
+              <a href="{{ '/blog/editcomment?comment=%s&post=%s' % (c.key().id(), c.post_key) }}" class="button-edit">
+                Edit
+              </a>
+              <a href="{{ '/blog/deletecomment?comment=%s&post=%s' % (c.key().id(), c.post_key) }}" class="button-delete">
+                Delete
+              </a>
+          </div>
+        {% else %}
+        <!--blank-->
+        {% endif %}
     {% endfor %}
   </section>
 </div>

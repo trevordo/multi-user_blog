@@ -35,7 +35,22 @@
 
 .blog-comment-form {
     padding-top: 50px;
-    padding-bottom: 50px;
+    padding-bottom: 10px;
+}
+
+.blog-comment-textarea {
+    width: 80%;
+    height: 100px;
+}
+
+.blog-comment-button {
+    position: relative;
+    width: 80%;
+    height: 21px;
+    display:inline-block;
+    overflow: auto;
+    white-space: nowrap;
+    margin:0px auto;
 }
 
 .button-edit {
