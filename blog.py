@@ -206,13 +206,11 @@ class EditPost(BlogHandler):
             self.error(404)
             return
 
-        else:
-            self.render("editpost.html", subject=subject, content=content)
-          
-        
         if post and post.author != self.user.name:
             error = "You are not the author."
             self.redirect('error.html', error=error)
+        else:
+            self.render("editpost.html", subject=subject, content=content)
 
     def post(self):
         if not self.user:
@@ -254,16 +252,15 @@ class DeletePost(BlogHandler):
             self.error(404)
             return
 
-        else:
-            self.render("deletepost.html", post=post)    
-
         if post and post.author != self.user.name:
             error = "You are not the author."
             self.redirect('error.html', error=error)
+        else:
+            self.render("deletepost.html", post=post)    
 
     def post(self):
         if not self.user:
-            self.redirect('/blog')
+            self.redirect('/login')
 
         else:
             post_id = self.request.get("post")
@@ -349,12 +346,11 @@ class EditComment(BlogHandler):
             self.error(404)
             return
 
-        else:
-            self.render("editcomment.html", content=comment, q=q)
-
         if q and q.author != self.user.name:
             error = "You are not the author."
             self.redirect('error.html', error=error)
+        else:
+            self.render("editcomment.html", content=comment, q=q)
 
     def post(self):
         if not self.user:
@@ -382,7 +378,7 @@ class EditComment(BlogHandler):
             self.render("editcomment.html",
                         comment=comment,
                         error=error)
-                        
+
 class DeleteComment(BlogHandler):
     def get(self):
         if not self.user:
@@ -401,12 +397,11 @@ class DeleteComment(BlogHandler):
             self.error(404)
             return
 
-        else:
-            self.render("deletecomment.html", comments=q)
-        
         if q and q.author != self.user.name:
             error = "You are not the author."
             self.redirect('error.html', error=error)
+        else:
+            self.render("deletecomment.html", comments=q)
 
     def post(self):
         if not self.user:
