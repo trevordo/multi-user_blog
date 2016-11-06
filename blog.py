@@ -297,6 +297,7 @@ class DetailsPage(BlogHandler):
                      post = post,
                      comments = comments)
 
+    # New comment check user in place
     def post(self):
         if not self.user:
             self.redirect('/login')
