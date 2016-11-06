@@ -171,7 +171,7 @@ class NewPost(BlogHandler):
 
     def post(self):
         if not self.user:
-            self.redirect('/blog')
+            self.redirect('/login')
 
         subject = self.request.get('subject')
         content = self.request.get('content')
@@ -193,26 +193,40 @@ class NewPost(BlogHandler):
 
 class EditPost(BlogHandler):
     def get(self):
-        if self.user:
-            post_id = self.request.get("post")
-            key = db.Key.from_path('Post', int(post_id), parent=blog_key())
-            post = db.get(key)
-            subject = post.subject
-            content = post.content
+        if not self.user:
+            self.redirect("/login")  
 
-            self.render("editpost.html", subject=subject, content=content)
+        post_id = self.request.get("post")
+        key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+        post = db.get(key)
+        subject = post.subject
+        content = post.content
+
+        if not post:
+            self.error(404)
+            return
+
         else:
-            self.redirect("/login")
+            self.render("editpost.html", subject=subject, content=content)
+          
+        
+        if post and post.author != self.user.name:
+            error = "You are not the author."
+            self.redirect('error.html', error=error)
 
     def post(self):
         if not self.user:
-            self.redirect('/blog')
+            self.redirect('/login')
 
         post_id = self.request.get("post")
         key = db.Key.from_path('Post', int(post_id), parent=blog_key())
         post = db.get(key)
         subject = self.request.get('subject')
         content = self.request.get('content')
+
+        if post and post.author != self.user.name:
+            error = "You are not the author."
+            self.redirect('error.html', error=error)
 
         if subject and content:
             post.subject = subject
@@ -229,14 +243,23 @@ class EditPost(BlogHandler):
 
 class DeletePost(BlogHandler):
     def get(self):
-        if self.user:
-            post_id = self.request.get("post")
-            key = db.Key.from_path('Post', int(post_id), parent=blog_key())
-            post = db.get(key)
-
-            self.render("deletepost.html", post=post)
-        else:
+        if not self.user:
             self.redirect("/login")
+            
+        post_id = self.request.get("post")
+        key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+        post = db.get(key)
+
+        if not post:
+            self.error(404)
+            return
+
+        else:
+            self.render("deletepost.html", post=post)    
+
+        if post and post.author != self.user.name:
+            error = "You are not the author."
+            self.redirect('error.html', error=error)
 
     def post(self):
         if not self.user:
@@ -261,7 +284,6 @@ class DeletePost(BlogHandler):
 
 class DetailsPage(BlogHandler):
     def get(self):
-
         # get post
         post_id = self.request.get("post")
         key = db.Key.from_path('Post', int(post_id), parent=blog_key())
@@ -280,7 +302,7 @@ class DetailsPage(BlogHandler):
 
     def post(self):
         if not self.user:
-            self.redirect('/blog')
+            self.redirect('/login')
 
         post_id = self.request.get("post")
         key = db.Key.from_path('Post', int(post_id), parent=blog_key())
@@ -309,21 +331,30 @@ class DetailsPage(BlogHandler):
 
 class EditComment(BlogHandler):
     def get(self):
-        if self.user:
-            post_id = self.request.get("post")
-            key = db.Key.from_path('Post', int(post_id), parent=blog_key())
-            post = db.get(key)
-            comment_id = self.request.get("comment")
-            key = db.Key.from_path('Comment',
-                                    int(comment_id),
-                                    parent=blog_key())
-            q = db.get(key)
-
-            comment = q.comment
-
-            self.render("editcomment.html", content=comment, q=q)
-        else:
+        if not self.user:
             self.redirect("/login")
+
+        post_id = self.request.get("post")
+        key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+        post = db.get(key)
+        comment_id = self.request.get("comment")
+        key = db.Key.from_path('Comment',
+                                int(comment_id),
+                                parent=blog_key())
+        q = db.get(key)
+
+        comment = q.comment
+
+        if not post:
+            self.error(404)
+            return
+
+        else:
+            self.render("editcomment.html", content=comment, q=q)
+
+        if q and q.author != self.user.name:
+            error = "You are not the author."
+            self.redirect('error.html', error=error)
 
     def post(self):
         if not self.user:
@@ -336,6 +367,10 @@ class EditComment(BlogHandler):
         key = db.Key.from_path('Comment', int(comment_id), parent=blog_key())
         c = db.get(key)
         comment = self.request.get('content')
+
+        if c and c.author != self.user.name:
+            error = "You are not the author."
+            self.redirect('error.html', error=error)
 
         if comment:
             c.comment = comment
@@ -350,19 +385,28 @@ class EditComment(BlogHandler):
                         
 class DeleteComment(BlogHandler):
     def get(self):
-        if self.user:
-            post_id = self.request.get("post")
-            key = db.Key.from_path('Post', int(post_id), parent=blog_key())
-            post = db.get(key)
-            comment_id = self.request.get("comment")
-            key = db.Key.from_path('Comment',
-                                    int(comment_id),
-                                    parent=blog_key())
-            q = db.get(key)
-
-            self.render("deletecomment.html", comments=q)
-        else:
+        if not self.user:
             self.redirect("/login")
+
+        post_id = self.request.get("post")
+        key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+        post = db.get(key)
+        comment_id = self.request.get("comment")
+        key = db.Key.from_path('Comment',
+                                int(comment_id),
+                                parent=blog_key())
+        q = db.get(key)
+
+        if not post:
+            self.error(404)
+            return
+
+        else:
+            self.render("deletecomment.html", comments=q)
+        
+        if q and q.author != self.user.name:
+            error = "You are not the author."
+            self.redirect('error.html', error=error)
 
     def post(self):
         if not self.user:
