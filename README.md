@@ -23,6 +23,7 @@ Google deployment
 
 $ cd "/path_of_program/"
 $ gcloud app deploy
+$ gcloud app browse
 
 ```
 Local deployment

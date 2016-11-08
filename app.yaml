@@ -6,8 +6,8 @@ handlers:
 - url: /css
   static_dir: css
 
-- url: /img
-  static_dir: img
+- url: /models
+  static_dir: models
 
 - url: /.*
   script: blog.app
