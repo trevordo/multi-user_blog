@@ -18,9 +18,17 @@ Features:
 
 To use install Google app engine 
 
+Google deployment
 ```sh
 
 $ cd "/path_of_program/"
 $ gcloud app deploy
+
+```
+Local deployment
+```sh
+
+$ cd "/path_of_program/"
+$ dev_appserver.py .
 
 ```

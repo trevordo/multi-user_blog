@@ -171,7 +171,7 @@ class NewPost(BlogHandler):
 
     def post(self):
         if not self.user:
-            self.redirect('/login')
+            return self.redirect('/login')
 
         subject = self.request.get('subject')
         content = self.request.get('content')
@@ -183,7 +183,8 @@ class NewPost(BlogHandler):
                      content = content,
                      author = author)
             p.put()
-            self.redirect('/blog/%s' % str(p.key().id()))
+            url = '/blog/%s' % str(p.key().id())
+            return self.redirect(url)
         else:
             error = "subject and content, please!"
             self.render("newpost.html",
@@ -214,7 +215,7 @@ class EditPost(BlogHandler):
 
     def post(self):
         if not self.user:
-            self.redirect('/login')
+            return self.redirect('/login')
 
         post_id = self.request.get("post")
         key = db.Key.from_path('Post', int(post_id), parent=blog_key())
@@ -230,7 +231,8 @@ class EditPost(BlogHandler):
             post.subject = subject
             post.content = content
             post.put()
-            self.redirect('/blog/%s' % str(post.key().id()))
+            url = '/blog/%s' % str(post.key().id())
+            return self.redirect(url)
 
         else:
             error = "subject and content are required, please!"
@@ -260,7 +262,7 @@ class DeletePost(BlogHandler):
 
     def post(self):
         if not self.user:
-            self.redirect('/login')
+            return self.redirect('/blog')
 
         else:
             post_id = self.request.get("post")
@@ -269,7 +271,7 @@ class DeletePost(BlogHandler):
 
             if post and post.author == self.user.name:
                 post.delete()
-                self.redirect('/blog')
+                return self.redirect('/blog')
             else:
                 error = "Post can only be deleted by author!"
                 self.render("deletepost.html",
@@ -297,10 +299,10 @@ class DetailsPage(BlogHandler):
                      post = post,
                      comments = comments)
 
-    # New comment check user in place
+    # New comment check user is logged
     def post(self):
         if not self.user:
-            self.redirect('/login')
+            return self.redirect('/blog')
 
         post_id = self.request.get("post")
         key = db.Key.from_path('Post', int(post_id), parent=blog_key())
@@ -316,7 +318,8 @@ class DetailsPage(BlogHandler):
                         comment = comment,
                         author = author)
             c.put()
-            self.redirect('/blog/details?post=%s' % str(post.key().id()))
+            url = '/blog/details?post=%s' % str(post.key().id())
+            return self.redirect(url)
         else:
             comments = db.Query(Comment).filter('post_key',
                                                 post_id).order('-created')
@@ -355,7 +358,7 @@ class EditComment(BlogHandler):
 
     def post(self):
         if not self.user:
-            self.redirect('/blog')
+            return self.redirect('/blog')
 
         post_id = self.request.get("post")
         key = db.Key.from_path('Post', int(post_id), parent=blog_key())
@@ -372,7 +375,8 @@ class EditComment(BlogHandler):
         if comment:
             c.comment = comment
             c.put()
-            self.redirect('/blog/details?post=%s' % str(post.key().id()))
+            url = '/blog/details?post=%s' % str(post.key().id())
+            return self.redirect(url)
 
         else:
             error = "Please enter a comment!"
@@ -406,7 +410,7 @@ class DeleteComment(BlogHandler):
 
     def post(self):
         if not self.user:
-            self.redirect('/blog')
+            return self.redirect('/blog')
 
         else:
             post_id = self.request.get("post")
@@ -420,7 +424,8 @@ class DeleteComment(BlogHandler):
 
             if q and q.author == self.user.name:
                 q.delete()
-                self.redirect('/blog/details?post=%s' % str(post.key().id()))
+                url = '/blog/details?post=%s' % str(post.key().id())
+                return self.redirect(url)
             else:
                 error = "comment can only be deleted by author!"
                 self.render("deletecomment.html",
@@ -432,21 +437,21 @@ class DeleteComment(BlogHandler):
 class LikePost(BlogHandler):
     def get(self):
         if not self.user:
-            self.redirect('/blog')
+            self.redirect('/login')
 
         post_id = self.request.get("post")
         key = db.Key.from_path('Post', int(post_id), parent=blog_key())
         post = db.get(key)
-
-        current_user = self.user.name
         author = post.author
 
-        if not self.user:
-            self.redirect('/login')
-        elif current_user in post.liked_by:
+        if self.user.name == author:
+            error = "You cannot like your own post"
+            self.render("error.html", error=error)
+        elif self.user.name in post.liked_by:
             error = "You already liked this post"
             self.render("error.html", error=error)
-        else:    
+        else:
+            current_user = self.user.name
             post.likes += int(1)
             post.liked_by.append(current_user)
             post.put()
@@ -455,21 +460,21 @@ class LikePost(BlogHandler):
 class UnlikePost(BlogHandler):
     def get(self):
         if not self.user:
-            self.redirect('/blog')
+            self.redirect('/login')
 
         post_id = self.request.get("post")
         key = db.Key.from_path('Post', int(post_id), parent=blog_key())
         post = db.get(key)
-
-        current_user = self.user.name
         author = post.author
 
-        if not self.user:
-            self.redirect('/login')
-        elif current_user not in post.liked_by:
+        if self.user.name == author:
+            error = "You cannot like your own post"
+            self.render("error.html", error=error)
+        elif self.user.name not in post.liked_by:
             error = "You have not yet liked this post"
             self.render("error.html", error=error)
         else:
+            current_user = self.user.name
             post.likes -= int(1)
             post.liked_by.remove(current_user)
             post.put()
@@ -530,7 +535,7 @@ class Signup(BlogHandler):
 
 class Register(Signup):
     def done(self):
-        #make sure the user doesn't already exist
+        # make sure the user doesn't already exist
         u = User.by_name(self.username)
         if u:
             msg = 'That user already exists.'
